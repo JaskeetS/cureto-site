@@ -292,7 +292,7 @@ main { flex: 1; position: relative; z-index: 1; padding-bottom: 8px; }
 
 /* arrival */
 @keyframes rise { from { opacity: 0; transform: translateY(22px); } to { opacity: 1; transform: none; } }
-.rise { animation: rise 0.8s cubic-bezier(0.2, 0.75, 0.25, 1) both; }
+.rise { animation: rise 0.8s cubic-bezier(0.2, 0.75, 0.25, 1) backwards; }
 .rise:nth-child(2) { animation-delay: 55ms; }
 .rise:nth-child(3) { animation-delay: 110ms; }
 .rise:nth-child(4) { animation-delay: 165ms; }
@@ -343,4 +343,65 @@ main { flex: 1; position: relative; z-index: 1; padding-bottom: 8px; }
 }
 @media (max-width: 400px) {
   .nav-pill a { padding: 0 11px; }
+}
+
+/* ---------- motion layer (fx.js). Everything below is calm, and all of it is off under reduced motion. ---------- */
+.card h2 + .details { margin-top: 20px; }
+.fluid { position: absolute; inset: 0; width: 100%; height: 100%; display: block; }
+.gl-on .field i { display: none; }
+
+/* hover: buttons and chips lift with a glow */
+@media (hover: hover) {
+  .btn:hover { box-shadow: var(--metalSh), 0 0 0 1px rgba(var(--accRGB), 0.35), 0 20px 40px -14px rgba(var(--accRGB), 0.75); }
+  .btn-glass:hover { box-shadow: 0 16px 32px -16px rgba(var(--accRGB), 0.6); }
+  .tags li { transition: transform 0.34s cubic-bezier(0.34, 1.56, 0.64, 1), box-shadow 0.3s, border-color 0.3s; }
+  .tags li:hover { transform: translateY(-3px); border-color: rgba(var(--accRGB), 0.55); box-shadow: 0 14px 28px -14px rgba(var(--accRGB), 0.65); }
+  .foot-links a, .nav-pill a { transition: background-color 0.25s, transform 0.3s cubic-bezier(0.34, 1.56, 0.64, 1); }
+  .foot-links a:hover { background: var(--optOn); transform: translateY(-2px); }
+}
+
+/* the 3D hero mark: desktop and tablet-landscape only */
+.hero { position: relative; }
+.mark3d { display: none; }
+@media (min-width: 1024px) {
+  .hero h1 { max-width: 9.6em; }
+  .mark3d { display: block; position: absolute; right: 24px; top: 40px; width: min(400px, 30vw); perspective: 1100px; pointer-events: none; z-index: 0; transform: translateY(calc(var(--py, 0) * 1px)); }
+  .m-tilt { transform-style: preserve-3d; transform: rotateX(var(--rx, 0deg)) rotateY(var(--ry, 0deg)); transition: transform 0.5s cubic-bezier(0.2, 0.75, 0.25, 1); }
+  .m-float { position: relative; transform-style: preserve-3d; animation: float3d 16s ease-in-out infinite alternate; }
+  .m-layer { display: block; width: 100%; height: auto; }
+  .m-layer + .m-layer { position: absolute; inset: 0; }
+  .m-layer { transform: translateZ(calc(var(--z) * -1px)); }
+  .m-layer:nth-child(1) { filter: drop-shadow(0 30px 40px rgba(var(--accRGB), 0.35)); }
+  .m-layer:nth-child(2) { opacity: 0.55; }
+  .m-layer:nth-child(3) { opacity: 0.35; }
+  .m-layer:nth-child(4) { opacity: 0.2; }
+}
+@keyframes float3d {
+  from { transform: rotateY(-24deg) rotateX(6deg) translateY(6px); }
+  to { transform: rotateY(24deg) rotateX(-4deg) translateY(-14px); }
+}
+
+/* pointer tilt with a soft light sheen (fx.js sets the variables; mouse only) */
+.tilt { position: relative; transform: perspective(1000px) rotateX(var(--rx, 0deg)) rotateY(var(--ry, 0deg)); transition: transform 0.5s cubic-bezier(0.2, 0.75, 0.25, 1); will-change: transform; }
+.tilt::after {
+  content: ""; position: absolute; inset: 0; border-radius: inherit; pointer-events: none;
+  background: radial-gradient(520px circle at var(--mx, 50%) var(--my, 0%), rgba(255, 255, 255, 0.55), transparent 55%);
+  opacity: var(--sheen, 0); transition: opacity 0.35s;
+}
+[data-theme="dark"] .tilt::after { background: radial-gradient(520px circle at var(--mx, 50%) var(--my, 0%), rgba(255, 255, 255, 0.12), transparent 55%); }
+
+@media (prefers-reduced-motion: no-preference) {
+  /* headline words rise in, in 3D */
+  .hero h1 { perspective: 900px; }
+  .split .w { display: inline-block; transform-origin: 50% 100%; animation: wordIn 1.05s cubic-bezier(0.2, 0.75, 0.25, 1) backwards; animation-delay: calc(var(--i) * 70ms + 120ms); }
+  @keyframes wordIn { from { opacity: 0; transform: translateY(0.5em) rotateX(-60deg); filter: blur(6px); } }
+  /* sections and cards fade and slide in as they enter */
+  .js .reveal { opacity: 0; transform: translateY(32px); transition: opacity 0.9s ease, transform 1s cubic-bezier(0.2, 0.75, 0.25, 1); }
+  .js .reveal.in { opacity: 1; transform: none; }
+  .reveal.in .tags li { animation: rise 0.7s cubic-bezier(0.2, 0.75, 0.25, 1) backwards; animation-delay: calc(var(--i) * 70ms + 250ms); }
+}
+@media (prefers-reduced-motion: reduce) {
+  .m-float { animation: none; transform: rotateY(-12deg) rotateX(3deg); }
+  .tilt { transform: none; }
+  .tilt::after { display: none; }
 }
